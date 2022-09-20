@@ -1,0 +1,15 @@
+pendulum
+global-logger
+
+aiogram
+
+sqlalchemy
+psycopg2
+
+sqlalchemy-utils
+passlib
+
+python-worker
+
+influxdb-client[async]
+aiohttp-retry
