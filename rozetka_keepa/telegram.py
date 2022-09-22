@@ -1,10 +1,15 @@
 import asyncio
 import re
 from copy import copy
+from typing import Optional
 
 import pendulum
 from aiogram import Bot, Dispatcher, executor, types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.markdown import escape_md, link
+from aiogram.utils.parts import MAX_MESSAGE_LENGTH
 from global_logger import Log
+from rozetka.entities.item import Item
 
 from rozetka_keepa import constants, tools
 from rozetka_keepa.db import DBController
@@ -51,32 +56,36 @@ async def deleteme(message: types.Message):
     await message.reply("Your user is removed.")
 
 
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith('/remove'))
 @dp.message_handler(commands=['remove'])
-async def remove_item(message: types.Message):  # /remove 123
+async def remove_item(message: types.Message | types.CallbackQuery):  # /remove 123
     cmd = '/remove'
-    obj = message.text.replace(f'{cmd} ', '')  # 123
+    text = getattr(message, 'text') or getattr(message, 'data')
+    message_obj = getattr(message, 'message', message)
+    obj = text.replace(f'{cmd} ', '')  # 123
     if not re.match(r'\d+', obj):
         await message.reply(f"Usage: {cmd} ID")
         return
 
     item_id = int(obj)
     telegram_id = message.from_user.id
+    chat_id = message_obj.chat.id
     kwargs = dict(telegram_id=telegram_id)
     exists = dbc.get_user(**kwargs)
     if not exists:
-        await message.reply(f"Your user does not exist.\n{REGISTER_USAGE}")
+        await bot.send_message(chat_id=chat_id, text=f"Your user does not exist.\n{REGISTER_USAGE}")
         return
 
     user = exists[0]
 
     existing = dbc.get_user_item_id(user, item_id=item_id)
     if existing:
-        item = existing[0]
-        await message.reply(f"Item {item} removed from watched")
+        item = existing[0]  #
         dbc.remove_item(item)
+        await bot.send_message(chat_id=chat_id, text=f"Item {item} removed from watched list")
         return
     else:
-        await message.reply(f"You didn't add an item ID {item_id}\n{USAGE}")
+        await bot.send_message(chat_id=chat_id, text=f"You didn't add an item ID {item_id}\n{USAGE}")
         return
 
 
@@ -147,8 +156,36 @@ async def list_(message: types.Message):
     if not items:
         return await message.reply(f"You haven't added the items yet.\n{USAGE}")
 
-    items_str = '\n'.join([str(i) for i in items])
-    await message.reply(f"Your Watched Items:\n{items_str}")  # todo: good repr with urls
+    items_obj = []
+    for item in items:
+        item_obj = Item.get(item.item_id)
+        item_obj.keepa = item
+        items_obj.append(item_obj)
+
+    # noinspection PyProtectedMember
+    unparsed_item_ids = [i.id_ for i in items_obj if not i._parsed]
+    if unparsed_item_ids:
+        message = await message.reply(f"One moment. Parsing {len(unparsed_item_ids)} items")
+        Item.parse_multiple(*unparsed_item_ids, parse_subitems=False)
+        await message.delete()
+
+    msgs = []
+    msg = f"Your Watched Items:"
+    for item_obj in items_obj:
+        msg_ = f"""        
+[{item_obj.id_}]({item_obj.href}) {escape_md(item_obj.title)}
+Cached Price: {escape_md(item_obj.price)}
+Wanted Price: {escape_md(item_obj.keepa.wanted_price)}
+Cached State: {escape_md(item_obj.sell_status)}
+"""
+        msg_tryout = msg + msg_
+        if len(msg_tryout) >= MAX_MESSAGE_LENGTH:
+            msgs.append(msg)
+            msg = ""
+        msg += msg_
+    msgs.append(msg)
+    for msg in msgs:
+        await message.reply(msg, disable_web_page_preview=True, parse_mode=types.ParseMode.MARKDOWN_V2, reply=False)
 
 
 @dp.async_task
@@ -157,32 +194,50 @@ async def checker_loop(*args, **kwargs):
         keepas = dbc.get_keepas()
         if keepas:
             item_ids = [i.item_id for i in keepas]
-            prices_current = await InfluxDBController.get_prices_async(item_ids)
+            Item.parse_multiple(*item_ids, parse_subitems=False)
+            # prices_influx = await InfluxDBController.get_prices_async(item_ids)
             for keepa in keepas:
-                pause_until = pendulum.instance(keepa.pause_until)
-                if pause_until > pendulum.now():
+                pause_until = pendulum.instance(keepa.pause_until, tz=pendulum.local_timezone())
+                if pause_until > pendulum.now(tz=pendulum.local_timezone()):
                     continue
 
-                price_current = prices_current.get(keepa.item_id)
+                item = keepa.item
+                # price_current = prices_influx.get(keepa.item_id)
+                price_current = item.price
                 price_wanted = keepa.wanted_price
-                if price_current is not None and price_current <= price_wanted:  # todo: check price is recent
+                if price_current is not None and price_current <= price_wanted:
                     user = dbc.get_user(id=keepa.user_id)
                     if not user:
                         LOG.warning(f"No User found for watched {keepa}")
                         continue
 
                     user = user[0]
-                    msg = f'Price trigger for {keepa} {keepa.url}\nWanted: {price_wanted}.\nCurrent: {price_current}'
-                    await bot.send_message(chat_id=user.telegram_id, text=msg)  # todo: inline, image, item title
+                    msg = f"""
+Price trigger for [{item.id_}]({item.href})
+{escape_md(item.title)}
+Wanted: {escape_md(price_wanted)}
+Current: {escape_md(price_current)}
+"""
+                    page_url = InlineKeyboardButton('Page', url=item.href)
+                    remove_item_btn = InlineKeyboardButton('Remove Watch', callback_data=f'/remove {keepa.item_id}')
+                    inline = InlineKeyboardMarkup(resize_keyboard=True).row(page_url, remove_item_btn)
+                    await bot.send_photo(chat_id=user.telegram_id, photo=item.image_main, caption=msg,
+                                         parse_mode=types.ParseMode.MARKDOWN_V2, allow_sending_without_reply=True,
+                                         reply_markup=inline)
                     keepa.pause()
                 elif price_current is not None and price_current > price_wanted:
                     keepa.reset_pause()
                 elif price_current is None:
-                    LOG.warning(f"No InfluxDB record found on {keepa}")
+                    LOG.warning(f"No record found on {keepa}")
                     continue
 
         dbc.commit()
         await asyncio.sleep(pendulum.Duration(hours=1).in_seconds())
+
+
+# @dp.callback_query_handler(lambda callback_query: True)
+# async def process_callback_kb1btn1(callback_query: types.CallbackQuery):
+#     pass
 
 
 if __name__ == '__main__':

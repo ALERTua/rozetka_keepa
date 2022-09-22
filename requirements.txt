@@ -14,4 +14,5 @@ python-worker
 influxdb-client[async]
 aiohttp-retry
 
+rozetka-api
 knockknock

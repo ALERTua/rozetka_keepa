@@ -1,6 +1,8 @@
 import uuid
 from datetime import datetime, timedelta
 from typing import Iterable, List
+
+from rozetka.entities.item import Item
 from sqlalchemy_utils import EmailType, UUIDType, PasswordType
 from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Float
 from sqlalchemy.ext.declarative import declarative_base
@@ -55,6 +57,17 @@ class Keepa(Base, DBBase):
 
     def reset_pause(self):
         self.pause_until = datetime.now()
+
+    @property
+    def item(self):
+        return self._item(parse=False)
+
+    def _item(self, parse=False):
+        output = Item.get(self.item_id)
+        # noinspection PyProtectedMember
+        if parse:
+            output.parse()
+        return output
 
 
 class User(Base, DBBase):
