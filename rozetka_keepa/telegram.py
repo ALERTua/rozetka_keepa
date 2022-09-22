@@ -1,19 +1,17 @@
 import asyncio
 import re
 from copy import copy
-from typing import Optional
 
 import pendulum
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.markdown import escape_md, link
+from aiogram.utils.markdown import escape_md
 from aiogram.utils.parts import MAX_MESSAGE_LENGTH
 from global_logger import Log
 from rozetka.entities.item import Item
 
 from rozetka_keepa import constants, tools
 from rozetka_keepa.db import DBController
-from rozetka_keepa.influxdb import InfluxDBController
 
 LOG = Log.get_logger()
 
@@ -218,6 +216,7 @@ Price trigger for [{item.id_}]({item.href})
 Wanted: {escape_md(price_wanted)}
 Current: {escape_md(price_current)}
 """
+                    # https://surik00.gitbooks.io/aiogram-lessons/content/chapter5.html
                     page_url = InlineKeyboardButton('Page', url=item.href)
                     remove_item_btn = InlineKeyboardButton('Remove Watch', callback_data=f'/remove {keepa.item_id}')
                     inline = InlineKeyboardMarkup(resize_keyboard=True).row(page_url, remove_item_btn)
