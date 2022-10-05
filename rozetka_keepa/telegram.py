@@ -26,6 +26,15 @@ REGISTER_USAGE = f'Use {REGISTER} to register'
 dbc = DBController.instantiate()
 
 
+def sell_status_str(sell_status):
+    if sell_status == 'unavailable':
+        return f'❌'
+    elif sell_status == 'available':
+        return f'✅'
+    else:
+        return sell_status
+
+
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     telegram_id = message.from_user.id
@@ -174,7 +183,7 @@ async def list_(message: types.Message):
 [{item_obj.id_}]({item_obj.href}) {escape_md(item_obj.title)}
 Cached Price: {escape_md(item_obj.price)}
 Wanted Price: {escape_md(item_obj.keepa.wanted_price)}
-Cached State: {escape_md(item_obj.sell_status)}
+Cached State: {escape_md(sell_status_str(item_obj.sell_status))}
 """
         msg_tryout = msg + msg_
         if len(msg_tryout) >= MAX_MESSAGE_LENGTH:
