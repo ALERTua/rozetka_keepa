@@ -179,11 +179,13 @@ async def list_(message: types.Message):
     msgs = []
     msg = f"Your Watched Items:"
     for item_obj in items_obj:
+        price_diff = item_obj.keepa.wanted_price - item_obj.price
+        price_diff_str = f'({price_diff})'
         msg_ = f"""        
 [{item_obj.id_}]({item_obj.href}) {escape_md(item_obj.title)}
 Cached Price: {escape_md(item_obj.price)}
-Wanted Price: {escape_md(item_obj.keepa.wanted_price)}
-Cached State: {escape_md(sell_status_str(item_obj.sell_status))}
+Wanted Price: {escape_md(item_obj.keepa.wanted_price)} {escape_md(price_diff_str)}
+Cached Availability: {escape_md(sell_status_str(item_obj.sell_status))}
 """
         msg_tryout = msg + msg_
         if len(msg_tryout) >= MAX_MESSAGE_LENGTH:
