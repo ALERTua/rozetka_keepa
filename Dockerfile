@@ -1,4 +1,4 @@
-FROM python:3.10.6
+FROM python:3.11
 MAINTAINER ALERT <alexey.rubasheff@gmail.com>
 
 WORKDIR /app
