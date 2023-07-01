@@ -54,18 +54,19 @@ class InfluxDBController:
 
             query_api = client.query_api()
 
-            fltr = f'r["_measurement"] == "{item_ids[0]}"'
+            fltr = f'r["id_"] == "{item_ids[0]}"'
             for item_id in item_ids[1:]:
-                fltr += f' or r["_measurement"] == "{item_id}"'
-            records = await query_api.query(
-                f"""import "influxdata/influxdb/schema"
-                from(bucket: "{INFLUXDB_BUCKET}")
-                    |> range(start: -3y)
-                    |> filter(fn: (r) => {fltr})
-                    |> filter(fn: (r) => r["_field"] == "price")
-                    |> last()
-                    |> schema.fieldsAsCols()
-                """)
+                fltr += f' or r["id_"] == "{item_id}"'
+            query = f"""
+import "influxdata/influxdb/schema"
+from(bucket: "{INFLUXDB_BUCKET}")
+    |> range(start: -3y)
+    |> filter(fn: (r) => {fltr})
+    |> filter(fn: (r) => r["_field"] == "price")
+    |> last()
+    |> schema.fieldsAsCols()
+"""
+            records = await query_api.query(query)
 
             return records
 
@@ -98,5 +99,5 @@ class InfluxDBController:
 
 
 if __name__ == '__main__':
-    output_ = InfluxDBController.get_prices([100001384, 100001630])
+    output_ = asyncio.run(InfluxDBController.get_prices_async([314164057, ]))
     pass
