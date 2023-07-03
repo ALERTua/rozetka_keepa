@@ -207,10 +207,16 @@ async def checker_loop(*args, **kwargs):
             # prices_influx = await InfluxDBController.get_prices_async(item_ids)
             for keepa in keepas:
                 pause_until = pendulum.instance(keepa.pause_until, tz=pendulum.local_timezone())
-                if pause_until > pendulum.now(tz=pendulum.local_timezone()):
+                skip = pause_until > pendulum.now(tz=pendulum.local_timezone())
+                if skip:
                     continue
 
                 item = keepa.item
+                available = (status := getattr(item, 'sell_status', 'available')) not in ('unavailable',)
+                if not available:
+                    LOG.debug(f"Skipping {keepa} for {item}: Status: {status}")
+                    continue
+
                 # price_current = prices_influx.get(keepa.item_id)
                 price_current = item.price
                 price_wanted = keepa.wanted_price

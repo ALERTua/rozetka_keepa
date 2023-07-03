@@ -67,7 +67,6 @@ from(bucket: "{INFLUXDB_BUCKET}")
     |> schema.fieldsAsCols()
 """
             records = await query_api.query(query)
-
             return records
 
     @staticmethod
