@@ -111,7 +111,7 @@ async def get_item(item_id: int, msg: Union[CallbackQuery, Message], price_str=N
         keepa = item.item
         # noinspection PyProtectedMember
         if not keepa._parsed:
-            temp_message = await message.reply(f"One moment. Parsing item")
+            temp_message = await message.reply(f"One moment. Parsing item", disable_notification=True)
             keepa.parse()
             await temp_message.delete()
 
@@ -198,7 +198,7 @@ async def list_(message: Message):
     # noinspection PyProtectedMember
     unparsed_item_ids = [i.id_ for i in items_obj if not i._parsed]
     if unparsed_item_ids:
-        message = await message.reply(f"One moment. Parsing {len(unparsed_item_ids)} items")
+        message = await message.reply(f"One moment. Parsing {len(unparsed_item_ids)} items", disable_notification=True)
         Item.parse_multiple(*unparsed_item_ids, parse_subitems=False)
         await message.delete()
 
