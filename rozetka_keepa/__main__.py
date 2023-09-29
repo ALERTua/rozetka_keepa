@@ -1,14 +1,14 @@
-from aiogram import executor
+import asyncio
 from global_logger import Log
 from knockknock import telegram_sender, discord_sender, slack_sender, teams_sender
 from rozetka_keepa import constants
-from rozetka_keepa.telegram import dp, checker_loop
+from rozetka_keepa.telegram import main
 
 LOG = Log.get_logger()
 
 
-def main():
-    executor.start_polling(dp, skip_updates=True, on_startup=checker_loop)
+def _main():
+    return asyncio.run(main())
 
 
 if __name__ == '__main__':
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     assert constants.TELEGRAM_BOT_API_TOKEN, "Please fill Telegram variables"
     assert constants.DB_URL, "Please fill Database variables"
 
-    fnc = main  # https://github.com/huggingface/knockknock
+    fnc = _main  # https://github.com/huggingface/knockknock
     if tg_chat := constants.TELEGRAM_ANNOUNCE_CHAT:
         fnc = telegram_sender(token=constants.TELEGRAM_BOT_API_TOKEN, chat_id=int(tg_chat))(fnc)
 
