@@ -13,31 +13,25 @@ where %DOCKER_EXE% >nul || (
 )
 
 pushd %~dp0
-
-echo Checking service %DOCKER_SERVICE% runing
 sc query %DOCKER_SERVICE% | findstr /IC:"running" >nul || (
-    echo Starting service %DOCKER_SERVICE%
+    echo starting Docker service %DOCKER_SERVICE%
     sudo net start %DOCKER_SERVICE% || (
         echo "Error starting docker service %DOCKER_SERVICE%
         exit /b
     )
-    echo Service %DOCKER_SERVICE% started
 )
 
-echo Checking Docker Desktop is running
 tasklist | findstr /IC:"Docker Desktop.exe" >nul || (
-    echo Starting Docker Desktop
     start "" "%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
-    timeout /t 60
+    :loop
+        call docker info >nul 2>nul || (
+            timeout /t 1 >nul
+            goto loop
+        )
+    rem timeout /t 60
 )
-echo Done checking Docker Desktop is running
 
-echo Building the image
 "%DOCKER_EXE%" build -t %BUILD_TAG% %BUILD_PATH% || exit /b
-echo Done building the image
-
-echo Pushing the image
 "%DOCKER_EXE%" push %REGISTRY_IP%:%REGISTRY_PORT%/%IMAGE_NAME% || exit /b
-echo Done pushing the image
 
 @REM net stop %DOCKER_SERVICE% || exit /b
