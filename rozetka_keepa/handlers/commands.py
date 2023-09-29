@@ -127,8 +127,12 @@ Added @ {item.added}
         builder.button(text='Page', url=href)
         remove_watch_callback_data = RemoveItemCallback(item_id=item_id).pack()
         builder.button(text='Remove Watch', callback_data=remove_watch_callback_data)
-        await message.reply_photo(photo=image, caption=msg, parse_mode=ParseMode.HTML,
-                                  allow_sending_without_reply=True, reply_markup=builder.as_markup())
+        if image:
+            await message.reply_photo(photo=image, caption=msg, parse_mode=ParseMode.HTML,
+                                      allow_sending_without_reply=True, reply_markup=builder.as_markup())
+        else:
+            await message.reply(text=msg, parse_mode=ParseMode.HTML, allow_sending_without_reply=True,
+                                reply_markup=builder.as_markup())
         return
 
     if (price := tools.float_from_str(price_str)) is None:
