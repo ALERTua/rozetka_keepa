@@ -6,6 +6,8 @@ log = Log.get_logger()
 if os.getenv('VERBOSE') == 'True':
     log.verbose = True
 
+MAX_MESSAGE_LENGTH = 4096
+
 INFLUXDB_URL = os.getenv('INFLUXDB_URL')
 INFLUXDB_TOKEN = os.getenv('INFLUXDB_TOKEN')
 INFLUXDB_ORG = os.getenv('INFLUXDB_ORG')

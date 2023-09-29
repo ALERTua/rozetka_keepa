@@ -10,6 +10,7 @@ sqlalchemy-utils
 passlib
 
 python-worker
+apscheduler
 
 influxdb-client[async]
 aiohttp-retry
