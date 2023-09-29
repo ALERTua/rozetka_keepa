@@ -1,10 +1,12 @@
 import uuid
 from datetime import datetime, timedelta
+from functools import cached_property
 from typing import Iterable, List
 
 from rozetka.entities.item import Item
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy_utils import EmailType, UUIDType, PasswordType
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Float
+from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Float, select
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from global_logger import Log
@@ -94,9 +96,26 @@ class DBController:
 
     def __init__(self, direct=True):
         assert not direct, "please use instantiate classmethod"
-        db_engine = create_engine(engine_str)  # , echo=log.verbose)
+        self._db = None
+
+    @cached_property
+    def db_engine(self):
+        db_engine = create_engine(engine_str, pool_pre_ping=True, pool_recycle=600)  # , echo=log.verbose)
         Base.metadata.create_all(db_engine)
-        self.db = sessionmaker(bind=db_engine)()
+        return db_engine
+
+    @property
+    def db(self):
+        if self._db is None:
+            self._db = sessionmaker(bind=self.db_engine)()
+        else:
+            try:
+                self._db.scalar(select(1))
+            except DBAPIError as err:
+                LOG.red(f"DB connection error: {err}")
+                self._db.close()
+
+        return self._db
 
     @classmethod
     def instantiate(cls):
