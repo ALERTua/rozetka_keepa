@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "rozetka-keepa"
+version = "0.2.0"
+description = "Rozetka.ua Keepa"
+authors = ["Alexey ALERT Rubasheff <alexey.rubasheff@gmail.com>"]
+readme = "README.rst"
+classifiers = [  # https://pypi.org/pypi?%3Aaction=list_classifiers
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+homepage = "https://github.com/ALERTua/rozetka_keepa"
+repository = "https://github.com/ALERTua/rozetka_keepa"
+documentation = "https://github.com/ALERTua/rozetka_keepa"
+keywords = ["rozetka"]
+include = ["HISTORY.rst"]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/ALERTua/rozetka_keepa/issues"
+
+[tool.poetry.dependencies]
+python = ">=3.11.6,<3.12"
+rozetka-api = "*"
+aiogram = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+sqlalchemy-utils = "*"
+passlib = "*"
+apscheduler = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
