@@ -61,6 +61,8 @@ CMD ["bash"]
 
 FROM python-base as production
 
+RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
+
 COPY --from=builder-base $POETRY_HOME $POETRY_HOME
 COPY --from=builder-base $VIRTUAL_ENV $VIRTUAL_ENV
 
@@ -69,5 +71,5 @@ WORKDIR $BASE_DIR
 COPY poetry.lock pyproject.toml ./
 COPY $SOURCE_DIR_NAME ./$SOURCE_DIR_NAME/
 
-#CMD ["sh", "-c", "python -m $SOURCE_DIR_NAME"]
-ENTRYPOINT ["sh", "-c", "python -m $SOURCE_DIR_NAME"]
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["sh", "-c", "python -m $SOURCE_DIR_NAME"]
