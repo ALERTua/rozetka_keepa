@@ -1,26 +1,12 @@
 import asyncio
-import atexit
-import pprint
-import signal
 
 from global_logger import Log
 from knockknock import telegram_sender, discord_sender, slack_sender, teams_sender
+
 from rozetka_keepa import constants
 from rozetka_keepa.telegram import main
 
 LOG = Log.get_logger()
-
-
-def signal_print(*args, **kwargs):
-    LOG.warning('Received signal:', pprint.pformat(args), pprint.pformat(kwargs))
-
-
-signals = (signal.SIGABRT, signal.SIGTRAP, signal.SIGFPE, signal.SIGILL, signal.SIGINT, signal.SIGSEGV,
-           signal.SIGTERM)
-for _signal in signals:
-    signal.signal(_signal, signal_print)
-
-atexit.register(signal_print)
 
 
 def _main():
