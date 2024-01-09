@@ -69,4 +69,5 @@ WORKDIR $BASE_DIR
 COPY poetry.lock pyproject.toml ./
 COPY $SOURCE_DIR_NAME ./$SOURCE_DIR_NAME/
 
-CMD ["sh", "-c", "python -m $SOURCE_DIR_NAME"]
+#CMD ["sh", "-c", "python -m $SOURCE_DIR_NAME"]
+ENTRYPOINT ["python -m $SOURCE_DIR_NAME"]
