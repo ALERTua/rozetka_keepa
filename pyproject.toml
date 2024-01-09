@@ -22,7 +22,7 @@ include = ["HISTORY.rst"]
 
 [tool.poetry.dependencies]
 python = ">=3.11.6,<3.12"
-rozetka-api = "*"
+rozetka-api = {version="*", allow-prereleases = true}
 aiogram = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
