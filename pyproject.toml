@@ -21,7 +21,8 @@ include = ["HISTORY.rst"]
 "Rozetka UserScript" = "https://github.com/ALERTua/rozetka_userscript"
 
 [tool.poetry.dependencies]
-python = ">=3.11.6,<3.12"
+python = "^3.12"
+pendulum = "*"
 rozetka-api = {version="*", allow-prereleases = true}
 aiogram = "*"
 sqlalchemy = "*"
