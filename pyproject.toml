@@ -1,6 +1,5 @@
 [tool.poetry]
-name = "rozetka-keepa"
-version = "0.3.0"
+package-mode = false
 description = "Rozetka.ua Keepa"
 authors = ["Alexey ALERT Rubasheff <alexey.rubasheff@gmail.com>"]
 readme = "README.md"
