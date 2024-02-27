@@ -35,7 +35,7 @@ async def set_commands(bot: Bot):
 
 
 async def main() -> None:
-    bot = Bot(token=constants.TELEGRAM_BOT_API_TOKEN, parse_mode=ParseMode.HTML)
+    bot = Bot(token=constants.TELEGRAM_BOT_API_TOKEN)
     dp = Dispatcher()
     dp.include_router(loop.router)
     dp.include_router(commands.router)
