@@ -3,7 +3,7 @@ name = "rozetka-keepa"
 version = "0.3.0"
 description = "Rozetka.ua Keepa"
 authors = ["Alexey ALERT Rubasheff <alexey.rubasheff@gmail.com>"]
-readme = "README.rst"
+readme = "README.md"
 classifiers = [  # https://pypi.org/pypi?%3Aaction=list_classifiers
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
