@@ -4523,13 +4523,13 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "rozetka-api"
-version = "1.6.0"
+version = "1.6.1"
 description = "Rozetka Python API"
 optional = false
 python-versions = ">=3.12,<4.0"
 files = [
-    {file = "rozetka_api-1.6.0-py3-none-any.whl", hash = "sha256:e21e16b85519e642b23ed1c7873ae8f95505be6245293c5824f64443d25ee876"},
-    {file = "rozetka_api-1.6.0.tar.gz", hash = "sha256:b73e61239baeba202764f293356bd14f541281cc3294a64abd2d7876f514d6e8"},
+    {file = "rozetka_api-1.6.1-py3-none-any.whl", hash = "sha256:f27551621ec3b9f5f5b53f865e31c8936b054e02898a3b4237a7bcf7aa7ea820"},
+    {file = "rozetka_api-1.6.1.tar.gz", hash = "sha256:c1e219034e82e4c86055e3659b0c2f40695c8d588a37c55e38338ed838e9bb9f"},
 ]
 
 [package.dependencies]
