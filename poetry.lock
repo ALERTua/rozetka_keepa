@@ -683,35 +683,23 @@ files = [
 ]
 
 [[package]]
-name = "future"
-version = "1.0.0"
-description = "Clean single-source support for Python 3 and 2"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-files = [
-    {file = "future-1.0.0-py3-none-any.whl", hash = "sha256:929292d34f5872e70396626ef385ec22355a1fae8ad29e1a734c3e43f9fbc216"},
-    {file = "future-1.0.0.tar.gz", hash = "sha256:bd2968309307861edae1458a4f8a4f3598c03be43b97521076aebf5d94c07b05"},
-]
-
-[[package]]
 name = "global-logger"
-version = "0.3.33"
+version = "0.4.2"
 description = "Based on Python built-in logger, expands it, and provides a global logger to your system. Easy on-screen and/or .log files output setup without pain for Python newcomers. Python 2 and 3 compatible"
 optional = false
-python-versions = ">=2.7"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,!=3.7.*,>=2.7"
 files = [
-    {file = "global_logger-0.3.33-py2.py3-none-any.whl", hash = "sha256:f89c43401515775cee27bc38d9263896f04598dad1232086a3041bff3f3da04f"},
-    {file = "global_logger-0.3.33.tar.gz", hash = "sha256:8bb10e7678729f3c3e8e0bea62d55d83e287be04380c94ab246d2aef715f0477"},
+    {file = "global_logger-0.4.2-py2.py3-none-any.whl", hash = "sha256:b5382e0867326acb786b1ddfa92c455e6e5b3cf9525d6794d95f565b46ec9690"},
+    {file = "global_logger-0.4.2.tar.gz", hash = "sha256:0d445790680a46d706add55f03ee9ed0e383c771b8a78d3924971337c18ffc8d"},
 ]
 
 [package.dependencies]
-colorama = "*"
-colorlog = {version = "*", markers = "python_version >= \"3.5\""}
-future = "*"
-pendulum = ">=2.1.2"
+colorama = {version = "0.4.6", markers = "python_full_version > \"3.0.0\""}
+colorlog = {version = "6.8.2", markers = "python_version >= \"3.5\""}
+pendulum = {version = ">=3.0.0,<4.0.0", markers = "python_full_version > \"3.8.0\""}
 win-unicode-console = [
-    {version = ">0.4", markers = "platform_system == \"Windows\" and platform_version < \"10.0.18362\""},
     {version = "0.4", markers = "platform_system == \"Windows\" and platform_version >= \"10.0.18362\""},
+    {version = ">0.4", markers = "platform_system == \"Windows\" and platform_version < \"10.0.18362\""},
 ]
 
 [[package]]
