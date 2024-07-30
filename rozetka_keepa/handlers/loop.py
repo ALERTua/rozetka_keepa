@@ -1,4 +1,4 @@
-from typing import List
+from __future__ import annotations
 
 import pendulum
 from aiogram import Bot, Dispatcher, Router
@@ -6,12 +6,11 @@ from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.utils.text_decorations import HtmlDecoration, MarkdownDecoration
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from global_logger import Log
 from rozetka.entities.item import Item
+
 from rozetka_keepa.db import DBController
 from rozetka_keepa.models.callbacks import RemoveItemCallback
-
-from global_logger import Log
-
 
 LOG = Log.get_logger()
 
@@ -24,13 +23,12 @@ md = MarkdownDecoration()
 router = Router()
 
 
-async def check(bot: Bot, dispatcher: Dispatcher, bots: List, router: Dispatcher):
+async def check(bot: Bot, dispatcher: Dispatcher, bots: list, _router: Dispatcher):  # noqa: ARG001
     LOG.debug("Checker")
     keepas = dbc.get_keepas()
     if keepas:
         item_ids = [i.item_id for i in keepas]
         Item.parse_multiple(*item_ids, parse_subitems=False)
-        # prices_influx = await InfluxDBController.get_prices_async(item_ids)
         for keepa in keepas:
             pause_until = pendulum.instance(keepa.pause_until, tz=pendulum.local_timezone())
             skip = pause_until > pendulum.now(tz=pendulum.local_timezone())
@@ -38,12 +36,11 @@ async def check(bot: Bot, dispatcher: Dispatcher, bots: List, router: Dispatcher
                 continue
 
             item = keepa.item
-            available = (status := getattr(item, 'sell_status', 'available')) not in ('unavailable',)
+            available = (status := getattr(item, "sell_status", "available")) not in ("unavailable",)
             if not available:
                 LOG.debug(f"Skipping {keepa} for {item}: Status: {status}")
                 continue
 
-            # price_current = prices_influx.get(keepa.item_id)
             price_current = item.price
             price_wanted = keepa.wanted_price
             if price_current is not None and price_current <= price_wanted:
@@ -60,9 +57,9 @@ async def check(bot: Bot, dispatcher: Dispatcher, bots: List, router: Dispatcher
     Current: {price_current}
     """
                 builder = InlineKeyboardBuilder()
-                builder.button(text='Page', url=item.href)
+                builder.button(text="Page", url=item.href)
                 remove_watch_callback_data = RemoveItemCallback(item_id=item.id_).pack()
-                builder.button(text='Remove Watch', callback_data=remove_watch_callback_data)
+                builder.button(text="Remove Watch", callback_data=remove_watch_callback_data)
                 await bot.send_photo(chat_id=user.telegram_id, photo=item.image_main, caption=msg,
                                      parse_mode=ParseMode.HTML, allow_sending_without_reply=True,
                                      reply_markup=builder.as_markup())
@@ -78,7 +75,7 @@ async def check(bot: Bot, dispatcher: Dispatcher, bots: List, router: Dispatcher
 
 async def checker_loop_start(**kwargs):
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(check, 'interval', hours=1, id='checker_loop_id', kwargs=kwargs)
+    scheduler.add_job(check, "interval", hours=1, id="checker_loop_id", kwargs=kwargs)
     scheduler.start()
 
 

@@ -1,23 +1,24 @@
+from __future__ import annotations
+
 import re
 from copy import copy
-from typing import Union
 
-from aiogram.types import CallbackQuery, Message, BotCommand
 from aiogram import Router
 from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import Command, CommandStart
+from aiogram.types import BotCommand, CallbackQuery, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.utils.text_decorations import HtmlDecoration, MarkdownDecoration
 from rozetka.entities.item import Item
 
-from rozetka_keepa import tools, constants
+from rozetka_keepa import constants, tools
 from rozetka_keepa.db import DBController
-from rozetka_keepa.models.callbacks import RemoveItemCallback, GetItemCallback
+from rozetka_keepa.models.callbacks import GetItemCallback, RemoveItemCallback
 
-ITEM_CMD = '/item'
+ITEM_CMD = "/item"
 USAGE = f"Usage: {ITEM_CMD} ID PRICE"
-REGISTER = '/start'
-REGISTER_USAGE = f'Use {REGISTER} to register'
+REGISTER = "/start"
+REGISTER_USAGE = f"Use {REGISTER} to register"
 
 router = Router()
 dbc = DBController.instantiate()
@@ -35,12 +36,12 @@ async def start(message: Message):
         await message.reply("You are already registered.")
         return
 
-    user = dbc.create_user(**kwargs)
+    dbc.create_user(**kwargs)
     dbc.commit()
     await message.reply("You are now registered.")
 
 
-@router.message(Command('deleteme'))
+@router.message(Command("deleteme"))
 async def deleteme(message: Message):
     telegram_id = message.from_user.id
     kwargs = dict(telegram_id=telegram_id)
@@ -54,7 +55,7 @@ async def deleteme(message: Message):
     await message.reply("Your user is removed.")
 
 
-async def remove_item(item_id: int, msg: Union[CallbackQuery, Message]):
+async def remove_item(item_id: int, msg: CallbackQuery | Message):
     message = msg if isinstance(msg, Message) else msg.message
     kwargs = dict(telegram_id=msg.from_user.id)
     exists = dbc.get_user(**kwargs)
@@ -79,12 +80,12 @@ async def remove_item_callback(query: CallbackQuery, callback_data: RemoveItemCa
     await remove_item(callback_data.item_id, query)
 
 
-@router.message(Command('remove'))
+@router.message(Command("remove"))
 async def remove_item_command(message: Message | CallbackQuery):  # /remove 123
-    cmd = '/remove'
-    text = getattr(message, 'text') or getattr(message, 'data')
-    obj = text.replace(f'{cmd} ', '')  # 123
-    if not re.match(r'\d+', obj):
+    cmd = "/remove"
+    text = message.text or message.data
+    obj = text.replace(f"{cmd} ", "")  # 123
+    if not re.match(r"\d+", obj):
         await message.reply(f"Usage: {cmd} ID")
         return
 
@@ -92,7 +93,7 @@ async def remove_item_command(message: Message | CallbackQuery):  # /remove 123
     await remove_item(item_id, message)
 
 
-async def get_item(item_id: int, msg: Union[CallbackQuery, Message], price_str=None):
+async def get_item(item_id: int, msg: CallbackQuery | Message, price_str=None):
     message = msg if isinstance(msg, Message) else msg.message
     telegram_id = message.from_user.id
     kwargs = dict(telegram_id=telegram_id)
@@ -110,8 +111,8 @@ async def get_item(item_id: int, msg: Union[CallbackQuery, Message], price_str=N
         item = existing[0]
         keepa = item.item
         # noinspection PyProtectedMember
-        if not keepa._parsed:
-            temp_message = await message.reply(f"One moment. Parsing item", disable_notification=True)
+        if not keepa._parsed:  # noqa: SLF001
+            temp_message = await message.reply("One moment. Parsing item", disable_notification=True)
             keepa.parse()
             await temp_message.delete()
 
@@ -124,16 +125,16 @@ Current: {keepa.price}
 Added @ {item.added}
 """
         builder = InlineKeyboardBuilder()
-        builder.button(text='Page', url=href)
+        builder.button(text="Page", url=href)
         remove_watch_callback_data = RemoveItemCallback(item_id=item_id).pack()
-        builder.button(text='Remove Watch', callback_data=remove_watch_callback_data)
+        builder.button(text="Remove Watch", callback_data=remove_watch_callback_data)
         if image:
             await message.reply_photo(photo=image, caption=msg, parse_mode=ParseMode.HTML,
                                       allow_sending_without_reply=True, reply_markup=builder.as_markup())
         else:
             await message.reply(text=msg, parse_mode=ParseMode.HTML, allow_sending_without_reply=True,
                                 reply_markup=builder.as_markup())
-        return
+        return None
 
     if (price := tools.float_from_str(price_str)) is None:
         return await message.reply("Please provide an integer or float price.")
@@ -151,6 +152,7 @@ Added @ {item.added}
 
     item = dbc.user_add_item(user=user, item_id=item_id, wanted_price=price)
     await message.reply(f"Item {item} added")
+    return None
 
 
 @router.callback_query(GetItemCallback.filter())
@@ -158,28 +160,29 @@ async def get_item_callback(query: CallbackQuery, callback_data: RemoveItemCallb
     await get_item(callback_data.item_id, query)
 
 
-@router.message(Command('item'))
+@router.message(Command("item"))
 async def add_edit_item(message: Message):
-    obj = message.text.replace(f'{ITEM_CMD} ', '')  # /item 123 12.99
-    obj_split = obj.split(' ')  # ['123', '12.99']
+    obj = message.text.replace(f"{ITEM_CMD} ", "")  # /item 123 12.99
+    obj_split = obj.split(" ")  # ['123', '12.99']
     if len(obj_split) == 1:  # ['123']
         item_id = obj_split[0]
         price_str = None
-    elif not len(obj_split) == 2:
+    elif len(obj_split) != 2:  # noqa: PLR2004
         return await message.reply(USAGE)
     else:
         item_id, price_str = obj_split  # '123' '12.99'
 
-    if not re.match(r'\d+', item_id):
+    if not re.match(r"\d+", item_id):
         return await message.reply(USAGE)
 
     item_id = int(item_id)
 
     await get_item(item_id, message, price_str=price_str)
+    return None
 
 
-@router.message(Command(BotCommand(command='list', description='items list')))
-@router.message(Command(BotCommand(command='items', description='items list')))
+@router.message(Command(BotCommand(command="list", description="items list")))
+@router.message(Command(BotCommand(command="items", description="items list")))
 async def list_(message: Message):
     telegram_id = message.from_user.id
     kwargs = dict(telegram_id=telegram_id)
@@ -200,17 +203,17 @@ async def list_(message: Message):
         items_obj.append(item_obj)
 
     # noinspection PyProtectedMember
-    unparsed_item_ids = [i.id_ for i in items_obj if not i._parsed]
+    unparsed_item_ids = [i.id_ for i in items_obj if not i._parsed]  # noqa: SLF001
     if unparsed_item_ids:
         message = await message.reply(f"One moment. Parsing {len(unparsed_item_ids)} items", disable_notification=True)
         Item.parse_multiple(*unparsed_item_ids, parse_subitems=False)
         await message.delete()
 
     msgs = []
-    msg = f"Your Watched Items:"
+    msg = "Your Watched Items:"
     for item_obj in items_obj:
         price_diff = item_obj.keepa.wanted_price - item_obj.price
-        price_diff_str = f'({price_diff})'
+        price_diff_str = f"({price_diff})"
         msg_ = f"""
 {html.link(item_obj.id_, item_obj.href)} {html.link(item_obj.title, item_obj.href)}
 Cached Price: {item_obj.price}
@@ -225,14 +228,15 @@ Cached Availability: {tools.sell_status_str(item_obj.sell_status)}
     msgs.append(msg)
     for msg in msgs:
         await message.answer(msg, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
+    return None
 
 
-@router.message(Command('test'))
+@router.message(Command("test"))
 async def test_(message: Message):
     from aiogram.utils.keyboard import InlineKeyboardBuilder
     builder = InlineKeyboardBuilder()
-    builder.button(text='Page', url='https://google.com')
+    builder.button(text="Page", url="https://google.com")
     remove_watch_callback_data = RemoveItemCallback(item_id=123456).pack()
-    builder.button(text='item', callback_data=remove_watch_callback_data)
-    await message.answer(text='abc', parse_mode=ParseMode.HTML, allow_sending_without_reply=True,
+    builder.button(text="item", callback_data=remove_watch_callback_data)
+    await message.answer(text="abc", parse_mode=ParseMode.HTML, allow_sending_without_reply=True,
                          reply_markup=builder.as_markup())

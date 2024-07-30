@@ -1,15 +1,17 @@
+from __future__ import annotations
+
 import uuid
 from datetime import datetime, timedelta
 from functools import cached_property
-from typing import Iterable, List
+from typing import Iterable, ClassVar
 
+from global_logger import Log
 from rozetka.entities.item import Item
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, create_engine, select
 from sqlalchemy.exc import DBAPIError
-from sqlalchemy_utils import EmailType, UUIDType, PasswordType
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Float, select
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from global_logger import Log
+from sqlalchemy_utils import EmailType, PasswordType, UUIDType
 
 from rozetka_keepa import constants
 
@@ -38,33 +40,33 @@ class DBBase:
 
 
 class Keepa(Base, DBBase):
-    __tablename__ = 'keepa'
-    id = Column('id', Integer, primary_key=True, autoincrement=True)
-    added = Column('added', DateTime, default=datetime.now())
+    __tablename__ = "keepa"
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    added = Column("added", DateTime, default=datetime.now())  # noqa: DTZ005  # TODO: local tz
 
-    item_id = Column('item_id', Integer)
-    user_id = Column('user_id', ForeignKey('users.id'))
-    wanted_price = Column('wanted_price', Float)
-    pause_until = Column('pause_until', DateTime, default=datetime.now())
+    item_id = Column("item_id", Integer)
+    user_id = Column("user_id", ForeignKey("users.id"))
+    wanted_price = Column("wanted_price", Float)
+    pause_until = Column("pause_until", DateTime, default=datetime.now())  # noqa: DTZ005  # TODO: local tz
 
     def __repr__(self):
-        return f'{self.item_id}@{self.wanted_price}'
+        return f"{self.item_id}@{self.wanted_price}"
 
     @property
     def url(self):
         return f"https://rozetka.com.ua/ua/search/?text={self.item_id}"
 
     def pause(self):
-        self.pause_until = datetime.now() + timedelta(days=1)
+        self.pause_until = datetime.now() + timedelta(days=1)  # noqa: DTZ005  # TODO: local tz
 
     def reset_pause(self):
-        self.pause_until = datetime.now()
+        self.pause_until = datetime.now()  # noqa: DTZ005  # TODO: local tz
 
     @property
     def item(self):
         return self._item(parse=False)
 
-    def _item(self, parse=False):
+    def _item(self, parse=False):  # noqa: FBT002
         output = Item.get(self.item_id)
         # noinspection PyProtectedMember
         if parse:
@@ -73,28 +75,28 @@ class Keepa(Base, DBBase):
 
 
 class User(Base, DBBase):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
-    id = Column('id', Integer, primary_key=True, autoincrement=True)
-    created = Column('created', DateTime, default=datetime.now())
-    auth_token = Column(name='auth_token', type_=UUIDType(binary=False), default=uuid.uuid4)
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    created = Column("created", DateTime, default=datetime.now())  # noqa: DTZ005  # TODO: local tz
+    auth_token = Column(name="auth_token", type_=UUIDType(binary=False), default=uuid.uuid4)
 
-    telegram_id = Column(name='telegram_id', type_=Integer, nullable=True)
-    email = Column(name='email', type_=EmailType, nullable=True)
-    username = Column(name='username', type_=String(32), nullable=True)
-    password = Column(name='password', type_=PasswordType(max_length=64, schemes=['pbkdf2_sha512']), nullable=True)
+    telegram_id = Column(name="telegram_id", type_=Integer, nullable=True)
+    email = Column(name="email", type_=EmailType, nullable=True)
+    username = Column(name="username", type_=String(32), nullable=True)
+    password = Column(name="password", type_=PasswordType(max_length=64, schemes=["pbkdf2_sha512"]), nullable=True)
 
     def __repr__(self):
-        return f'{self.id}'
+        return f"{self.id}"
 
     def auth_token_invalidate(self):
         self.auth_token = uuid.uuid4()
 
 
 class DBController:
-    cache = []
+    cache: ClassVar[DBController] = []
 
-    def __init__(self, direct=True):
+    def __init__(self, direct=True):  # noqa: FBT002
         assert not direct, "please use instantiate classmethod"
         self._db = None
 
@@ -156,7 +158,7 @@ class DBController:
         self.db.delete(_user)
         self.db.commit()
 
-    def get_user_items(self, user: User, **kwargs) -> List[Keepa]:
+    def get_user_items(self, user: User, **kwargs) -> list[Keepa]:
         return Keepa.find(self.db, user_id=user.id, **kwargs)
 
     def user_add_item(self, user: User, item_id: int, wanted_price: int):
@@ -167,7 +169,7 @@ class DBController:
     def get_user_item_id(self, user: User, item_id: int, **kwargs):
         return self.get_user_items(user=user, item_id=item_id, **kwargs)
 
-    def get_keepas(self) -> List[Keepa]:
+    def get_keepas(self) -> list[Keepa]:
         return Keepa.find(self.db)
 
     def remove_item(self, item: Keepa):
@@ -175,5 +177,5 @@ class DBController:
         self.db.commit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

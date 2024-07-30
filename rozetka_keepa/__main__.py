@@ -1,7 +1,7 @@
 import asyncio
 
 from global_logger import Log
-from knockknock import telegram_sender, discord_sender, slack_sender, teams_sender
+from knockknock import discord_sender, slack_sender, teams_sender, telegram_sender
 
 from rozetka_keepa import constants
 from rozetka_keepa.telegram import main
@@ -13,12 +13,14 @@ def _main():
     return asyncio.run(main())
 
 
-if __name__ == '__main__':
-    assert constants.INFLUXDB_URL and constants.INFLUXDB_TOKEN and constants.INFLUXDB_ORG \
-           and constants.INFLUXDB_BUCKET, "Please fill all INFLUXDB variables"
+if __name__ == "__main__":
+    assert constants.INFLUXDB_URL, "Please fill INFLUXDB_URL variable"
+    assert constants.INFLUXDB_TOKEN, "Please fill all INFLUXDB_TOKEN variable"
+    assert constants.INFLUXDB_ORG, "Please fill all INFLUXDB_ORG variable"
+    assert constants.INFLUXDB_BUCKET, "Please fill all INFLUXDB_BUCKET variable"
 
-    assert constants.TELEGRAM_BOT_API_TOKEN, "Please fill Telegram variables"
-    assert constants.DB_URL, "Please fill Database variables"
+    assert constants.TELEGRAM_BOT_API_TOKEN, "Please fill TELEGRAM_BOT_API_TOKEN variable"
+    assert constants.DB_URL, "Please fill DB_URL variable"
 
     fnc = _main  # https://github.com/huggingface/knockknock
     if tg_chat := constants.TELEGRAM_ANNOUNCE_CHAT:

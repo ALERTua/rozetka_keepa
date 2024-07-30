@@ -1,12 +1,12 @@
 import asyncio
+
 from aiogram import Bot, Dispatcher, F
-from aiogram.enums import ParseMode
 from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 from aiogram.utils.text_decorations import HtmlDecoration, MarkdownDecoration
-from rozetka_keepa.handlers import commands, loop
-from rozetka_keepa import constants
-
 from global_logger import Log
+
+from rozetka_keepa import constants
+from rozetka_keepa.handlers import commands, loop
 
 LOG = Log.get_logger()
 
@@ -24,11 +24,11 @@ async def set_commands(bot: Bot):
                 BotCommand(command="remove", description="remove item"),
                 BotCommand(command="item", description="get/add item"),
                 BotCommand(command="deleteme", description="unregister"),
-                # BotCommand(command="test", description="test"),
+                # BotCommand(command="test", description="test"),  # noqa: ERA001
             ],
             BotCommandScopeAllPrivateChats(),
-            None
-        )
+            None,
+        ),
     ]
     for commands_list, commands_scope, language in data:
         await bot.set_my_commands(commands=commands_list, scope=commands_scope, language_code=language)
@@ -44,5 +44,5 @@ async def main() -> None:
     await dp.start_polling(bot)  # , allowed_updates=dp.resolve_used_update_types())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

@@ -1,15 +1,19 @@
+from __future__ import annotations
+
 import asyncio
 from copy import copy
-from typing import Iterable, List
+from typing import Iterable, TYPE_CHECKING, ClassVar
 
 from aiohttp_retry import ExponentialRetry, RetryClient
 from global_logger import Log
-from influxdb_client.client.flux_table import FluxTable, FluxRecord
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 # noinspection PyPackageRequirements
 from worker import async_worker
 
 from rozetka_keepa import constants
+
+if TYPE_CHECKING:
+    from influxdb_client.client.flux_table import FluxTable, FluxRecord
 
 LOG = Log.get_logger()
 
@@ -25,9 +29,9 @@ INFLUX_KWARGS_ASYNC.update(dict(client_session_type=RetryClient,
 
 
 class InfluxDBController:
-    cache = []
+    cache: ClassVar[list[InfluxDBController]] = []
 
-    def __init__(self, direct=True):
+    def __init__(self, direct=True):  # noqa: FBT002
         assert not direct, "please use instantiate classmethod"
 
     @classmethod
@@ -49,8 +53,8 @@ class InfluxDBController:
         async with InfluxDBClientAsync(**INFLUX_KWARGS_ASYNC) as client:
             ready = await client.ping()
             if not ready:
-                LOG.error(f"InfluxDB NOT READY")
-                return
+                LOG.error("InfluxDB NOT READY")
+                return None
 
             query_api = client.query_api()
 
@@ -67,15 +71,15 @@ from(bucket: "{INFLUXDB_BUCKET}")
     |> schema.fieldsAsCols()
 """
             records = await query_api.query(query)
-            return records
+            return records  # noqa: RET504
 
     @staticmethod
     def _parse_points(points):
         output = {}
         for point in points:
             record: FluxRecord = point.records[0]
-            item_id = int(record.values['_measurement'])
-            price = float(record.values['price'])
+            item_id = int(record.values["_measurement"])  # noqa: PD011
+            price = float(record.values["price"])  # noqa: PD011
             output[item_id] = price
         return output
 
@@ -85,7 +89,7 @@ from(bucket: "{INFLUXDB_BUCKET}")
             item_ids = [item_ids]
         crtn = asyncio.run(InfluxDBController._get_points_async_worker(item_ids))
         crtn.wait()
-        points: List[FluxTable] = crtn.ret
+        points: list[FluxTable] = crtn.ret
         return InfluxDBController._parse_points(points)
 
     @staticmethod
@@ -97,6 +101,5 @@ from(bucket: "{INFLUXDB_BUCKET}")
         return InfluxDBController._parse_points(points)
 
 
-if __name__ == '__main__':
-    output_ = asyncio.run(InfluxDBController.get_prices_async([314164057, ]))
-    pass
+if __name__ == "__main__":
+    output_ = asyncio.run(InfluxDBController.get_prices_async([314164057 ]))
