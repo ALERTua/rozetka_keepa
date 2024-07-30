@@ -60,9 +60,14 @@ async def check(bot: Bot, dispatcher: Dispatcher, bots: list, router: Dispatcher
                 builder.button(text="Page", url=item.href)
                 remove_watch_callback_data = RemoveItemCallback(item_id=item.id_).pack()
                 builder.button(text="Remove Watch", callback_data=remove_watch_callback_data)
-                await bot.send_photo(chat_id=user.telegram_id, photo=item.image_main, caption=msg,
-                                     parse_mode=ParseMode.HTML, allow_sending_without_reply=True,
-                                     reply_markup=builder.as_markup())
+                await bot.send_photo(
+                    chat_id=user.telegram_id,
+                    photo=item.image_main,
+                    caption=msg,
+                    parse_mode=ParseMode.HTML,
+                    allow_sending_without_reply=True,
+                    reply_markup=builder.as_markup(),
+                )
                 keepa.pause()
             elif price_current is not None and price_current > price_wanted:
                 keepa.reset_pause()
