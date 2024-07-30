@@ -22,20 +22,21 @@ include = ["HISTORY.rst"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-pendulum = "*"
-rozetka-api = {version="*", allow-prereleases = true}
-aiogram = "*"
-sqlalchemy = "*"
-psycopg2-binary = "*"
-sqlalchemy-utils = "*"
-passlib = "*"
-apscheduler = "*"
+pendulum = "^3.0.0"
+rozetka-api = {version="^1.6.2", allow-prereleases = true}
+aiogram = "^3.10.0"
+sqlalchemy = "^2.0.31"
+psycopg2-binary = "^2.9.9"
+sqlalchemy-utils = "^0.41.2"
+passlib = "^1.7.4"
+apscheduler = "^3.10.4"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "*"
+pytest = "^8.3.2"
+poetry = "^1.8.3"
 
 [build-system]
-requires = ["poetry-core>=1.9.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [virtualenvs]
