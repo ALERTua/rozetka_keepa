@@ -1,6 +1,9 @@
 import os
 
 from global_logger import Log
+from dotenv import load_dotenv
+
+load_dotenv()
 
 log = Log.get_logger()
 if os.getenv("VERBOSE") == "True":
