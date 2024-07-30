@@ -23,7 +23,7 @@ md = MarkdownDecoration()
 router = Router()
 
 
-async def check(bot: Bot, dispatcher: Dispatcher, bots: list, _router: Dispatcher):  # noqa: ARG001
+async def check(bot: Bot, dispatcher: Dispatcher, bots: list, router: Dispatcher):  # noqa: ARG001
     LOG.debug("Checker")
     keepas = dbc.get_keepas()
     if keepas:
