@@ -1,5 +1,6 @@
 [tool.poetry]
 package-mode = false
+name = "rozetka_keepa"
 description = "Rozetka.ua Keepa"
 authors = ["Alexey ALERT Rubasheff <alexey.rubasheff@gmail.com>"]
 readme = "README.md"
@@ -36,3 +37,7 @@ pytest = "*"
 [build-system]
 requires = ["poetry-core>=1.9.0"]
 build-backend = "poetry.core.masonry.api"
+
+[virtualenvs]
+create = true
+in-project = true
