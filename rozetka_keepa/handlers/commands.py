@@ -257,7 +257,7 @@ async def test_(message: Message):
     remove_watch_callback_data = RemoveItemCallback(item_id=123456).pack()
     builder.button(text="item", callback_data=remove_watch_callback_data)
     await message.answer(
-        text="abc",
+        text="test",
         parse_mode=ParseMode.HTML,
         allow_sending_without_reply=True,
         reply_markup=builder.as_markup(),
