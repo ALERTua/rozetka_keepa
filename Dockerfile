@@ -50,7 +50,7 @@ WORKDIR $BASE_DIR
 COPY poetry.lock pyproject.toml ./
 
 RUN --mount=type=cache,target=$CACHE_PATH \
-    poetry install --no-root --only main --compile
+    poetry install --no-root --compile --only main
 
 
 FROM builder-base as development
@@ -58,7 +58,7 @@ FROM builder-base as development
 WORKDIR $BASE_DIR
 
 RUN --mount=type=cache,target=$CACHE_PATH \
-    poetry install --no-root --compile
+    poetry install --no-root --compile --with dev
 
 CMD ["bash"]
 
