@@ -129,11 +129,20 @@ Added @ {item.added}
         remove_watch_callback_data = RemoveItemCallback(item_id=item_id).pack()
         builder.button(text="Remove Watch", callback_data=remove_watch_callback_data)
         if image:
-            await message.reply_photo(photo=image, caption=msg, parse_mode=ParseMode.HTML,
-                                      allow_sending_without_reply=True, reply_markup=builder.as_markup())
+            await message.reply_photo(
+                photo=image,
+                caption=msg,
+                parse_mode=ParseMode.HTML,
+                allow_sending_without_reply=True,
+                reply_markup=builder.as_markup(),
+            )
         else:
-            await message.reply(text=msg, parse_mode=ParseMode.HTML, allow_sending_without_reply=True,
-                                reply_markup=builder.as_markup())
+            await message.reply(
+                text=msg,
+                parse_mode=ParseMode.HTML,
+                allow_sending_without_reply=True,
+                reply_markup=builder.as_markup(),
+            )
         return None
 
     if (price := tools.float_from_str(price_str)) is None:
@@ -212,6 +221,14 @@ async def list_(message: Message):
     msgs = []
     msg = "Your Watched Items:"
     for item_obj in items_obj:
+        if not hasattr(item_obj, "price"):
+            await message.answer(
+                f"Nonexistent item {html.link(item_obj.keepa.item_id, item_obj.keepa.url)}",
+                disable_web_page_preview=True,
+                parse_mode=ParseMode.HTML,
+            )
+            continue
+
         price_diff = item_obj.keepa.wanted_price - item_obj.price
         price_diff_str = f"({price_diff})"
         msg_ = f"""
@@ -234,9 +251,14 @@ Cached Availability: {tools.sell_status_str(item_obj.sell_status)}
 @router.message(Command("test"))
 async def test_(message: Message):
     from aiogram.utils.keyboard import InlineKeyboardBuilder
+
     builder = InlineKeyboardBuilder()
     builder.button(text="Page", url="https://google.com")
     remove_watch_callback_data = RemoveItemCallback(item_id=123456).pack()
     builder.button(text="item", callback_data=remove_watch_callback_data)
-    await message.answer(text="abc", parse_mode=ParseMode.HTML, allow_sending_without_reply=True,
-                         reply_markup=builder.as_markup())
+    await message.answer(
+        text="abc",
+        parse_mode=ParseMode.HTML,
+        allow_sending_without_reply=True,
+        reply_markup=builder.as_markup(),
+    )
