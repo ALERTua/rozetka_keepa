@@ -36,7 +36,7 @@ poetry = "^1.8.3"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
 poetry = "^1.8.3"
-pre-commit = "^3.8.0"
+pre-commit = "^4.0.0"
 ruff = "^0.5.5"
 
 [build-system]
