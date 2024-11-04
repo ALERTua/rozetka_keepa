@@ -24,7 +24,7 @@ include = ["HISTORY.rst"]
 python = "^3.12"
 pendulum = "^3.0.0"
 rozetka-api = {version="^1.6.6", allow-prereleases = true}
-aiogram = "^3.10.0"
+aiogram = "^3.14.0"
 sqlalchemy = "^2.0.31"
 psycopg2-binary = "^2.9.9"
 sqlalchemy-utils = "^0.41.2"
