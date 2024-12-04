@@ -35,8 +35,8 @@ python-dotenv = "^1.0.1"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 poetry = "^1.8.4"
-pre-commit = "^3.8.0"
-ruff = "^0.5.5"
+pre-commit = "^4.0.1"
+ruff = "^0.8.1"
 
 [build-system]
 requires = ["poetry-core"]
