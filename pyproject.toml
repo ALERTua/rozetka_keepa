@@ -31,7 +31,6 @@ sqlalchemy-utils = "^0.41.2"
 passlib = "^1.7.4"
 apscheduler = "^3.11.0"
 python-dotenv = "^1.0.1"
-poetry = "^1.8.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
