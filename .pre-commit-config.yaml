@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-merge-conflict
       - id: check-added-large-files
@@ -14,7 +14,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.4
+    rev: v0.8.1
     hooks:
       # Run the linter.
       - id: ruff
@@ -23,7 +23,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/python-poetry/poetry
-    rev: '1.8.0'
+    rev: '1.8.4'
     hooks:
     -   id: poetry-check
     -   id: poetry-lock
