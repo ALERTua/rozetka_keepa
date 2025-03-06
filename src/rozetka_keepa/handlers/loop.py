@@ -83,14 +83,14 @@ async def check(bot: Bot, dispatcher: Dispatcher, bots: list, router: Dispatcher
     dbc.commit()
 
 
-async def checker_loop(bot: Bot, dispatcher: Dispatcher, bots: list, router_: Dispatcher):
+async def checker_loop(**kwargs):
     while True:
-        await check(bot, dispatcher, bots, router_)
+        await check(**kwargs)
         await asyncio.sleep(constants.LOOP_INTERVAL)
 
 
-async def on_startup(bot: Bot, dispatcher: Dispatcher, bots: list, router_: Dispatcher):
-    task = asyncio.create_task(checker_loop(bot, dispatcher, bots, router_))
+async def on_startup(**kwargs):
+    task = asyncio.create_task(checker_loop(**kwargs))
     background_tasks.add(task)
     task.add_done_callback(background_tasks.discard)
 
