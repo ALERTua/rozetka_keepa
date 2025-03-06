@@ -2,8 +2,8 @@ import asyncio
 
 from global_logger import Log
 
-from rozetka_keepa import constants
-from rozetka_keepa.telegram import main
+from . import constants
+from .telegram import main
 
 LOG = Log.get_logger()
 

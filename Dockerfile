@@ -1,76 +1,56 @@
-FROM python:3.12-slim AS python-base
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS production
 
 LABEL maintainer="ALERT <alexey.rubasheff@gmail.com>"
 
-ENV \
-    BASE_DIR=/app \
-    SOURCE_DIR_NAME=rozetka_keepa
+ENV INFLUXDB_URL=""
+ENV INFLUXDB_TOKEN=""
+ENV INFLUXDB_ORG=""
+ENV INFLUXDB_BUCKET=""
+ENV TELEGRAM_TOKEN=""
+ENV TELEGRAM_BOT_API_TOKEN=""
+ENV DB_URL=""
+ENV TELEGRAM_ANNOUNCE_CHAT=""
+ENV DISCORD_WEBHOOK_URL=""
+ENV SLACK_WEBHOOK_URL=""
+ENV SLACK_CHANNEL=""
+ENV SLACK_USER_MENTIONS=""
+ENV TEAMS_WEBHOOK_URL=""
+ENV TEAMS_USER_MENTIONS=""
 
-WORKDIR $BASE_DIR
+ENV VERBOSE="False"
+
+ENV TZ="Europe/London"
+
 
 ENV \
+    # uv
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_FROZEN=1 \
+    UV_NO_PROGRESS=true \
+    UV_CACHE_DIR=.uv_cache \
     # Python
     PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
     PYTHONIOENCODING=utf-8 \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
     # pip
     PIP_DISABLE_PIP_VERSION_CHECK=on \
-    # poetry
-    POETRY_HOME="$BASE_DIR/poetry" \
-    POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_CREATE=false \
-    # venv and requirements path
-    VIRTUAL_ENV="$BASE_DIR/venv" \
-    # cache path is HOME/.cache
-    CACHE_PATH="/root/.cache" \
-    SOURCE_PATH="$BASE_DIR/$SOURCE_DIR_NAME"
-
-ENV PATH="$POETRY_HOME/bin:$VIRTUAL_ENV/bin:$PATH"
-
-RUN python -m venv $VIRTUAL_ENV
-
-ENV PYTHONPATH="$BASE_DIR:$PYTHONPATH"
+    # app
+    APP_DIR=/app \
+    SOURCE_DIR_NAME=src
 
 
-FROM python-base AS builder-base
+WORKDIR $APP_DIR
 
-# gcc build-essential are for aiocsv
-RUN apt-get update \
-    && apt-get install -y curl gcc build-essential \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=$UV_CACHE_DIR \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --no-install-project --no-dev
 
+COPY $SOURCE_DIR_NAME $SOURCE_DIR_NAME
 
-RUN --mount=type=cache,target=$CACHE_PATH \
-    curl -sSL https://install.python-poetry.org | python -
+ENTRYPOINT []
 
-WORKDIR $BASE_DIR
-
-COPY poetry.lock pyproject.toml ./
-
-RUN --mount=type=cache,target=$CACHE_PATH \
-    poetry install --no-root --compile --only main
-
-
-FROM builder-base AS development
-
-WORKDIR $BASE_DIR
-
-RUN --mount=type=cache,target=$CACHE_PATH \
-    poetry install --no-root --compile --with dev
-
-CMD ["bash"]
-
-
-FROM python-base AS production
-
-COPY --from=builder-base $POETRY_HOME $POETRY_HOME
-COPY --from=builder-base $VIRTUAL_ENV $VIRTUAL_ENV
-
-WORKDIR $BASE_DIR
-
-COPY poetry.lock pyproject.toml ./
-COPY $SOURCE_DIR_NAME ./$SOURCE_DIR_NAME/
-
-CMD ["sh", "-c", "python -m $SOURCE_DIR_NAME"]
+CMD uv run -m $SOURCE_DIR_NAME.rozetka_keepa

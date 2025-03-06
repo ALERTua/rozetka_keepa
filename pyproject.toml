@@ -1,47 +1,44 @@
-[tool.poetry]
-package-mode = false
+[project]
 name = "rozetka_keepa"
+version = "0"
 description = "Rozetka.ua Keepa"
-authors = ["Alexey ALERT Rubasheff <alexey.rubasheff@gmail.com>"]
+authors = [
+    { name = "Alexey ALERT Rubasheff", email = "alexey.rubasheff@gmail.com" }
+]
 readme = "README.md"
-classifiers = [  # https://pypi.org/pypi?%3Aaction=list_classifiers
+requires-python = "==3.12.*"
+keywords = ["rozetka"]
+classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
+dependencies = [
+    "aiogram>=3.18.0",
+    "apscheduler>=3.11.0",
+    "global-logger>=0.4.3",
+    "passlib>=1.7.4",
+    "pendulum>=3.0.0",
+    "psycopg2-binary>=2.9.10",
+    "python-dotenv>=1.0.1",
+    "rozetka-api>=1.6.9",
+    "sqlalchemy>=2.0.38",
+    "sqlalchemy-utils>=0.41.2",
+]
+[tool.uv]
+prerelease = "allow"
+
+[project.urls]
 homepage = "https://github.com/ALERTua/rozetka_keepa"
 repository = "https://github.com/ALERTua/rozetka_keepa"
 documentation = "https://github.com/ALERTua/rozetka_keepa"
-keywords = ["rozetka"]
-include = ["HISTORY.rst"]
-
-[tool.poetry.urls]
 "Bug Tracker" = "https://github.com/ALERTua/rozetka_keepa/issues"
 "Rozetka API" = "https://github.com/ALERTua/rozetka_api"
 "Rozetka Keepa" = "https://github.com/ALERTua/rozetka_keepa"
 "Rozetka FastAPI" = "https://github.com/ALERTua/rozetka_fastapi"
 "Rozetka UserScript" = "https://github.com/ALERTua/rozetka_userscript"
 
-[tool.poetry.dependencies]
-python = "^3.12"
-pendulum = "^3.0.0"
-rozetka-api = {version="^1.6.6", allow-prereleases = true}
-aiogram = "^3.15.0"
-sqlalchemy = "^2.0.36"
-psycopg2-binary = "^2.9.10"
-sqlalchemy-utils = "^0.41.2"
-passlib = "^1.7.4"
-apscheduler = "^3.11.0"
-python-dotenv = "^1.0.1"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-poetry = "^1.8.4"
-pre-commit = "^4.0.1"
-ruff = "^0.8.1"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[virtualenvs]
-create = true
-in-project = true
+[dependency-groups]
+dev = [
+    "pre-commit>=4.1.0",
+    "pytest>=8.3.5",
+    "ruff>=0.9.9",
+]

@@ -5,8 +5,8 @@ from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 from aiogram.utils.text_decorations import HtmlDecoration, MarkdownDecoration
 from global_logger import Log
 
-from rozetka_keepa import constants
-from rozetka_keepa.handlers import commands, loop
+from . import constants
+from .handlers import commands, loop
 
 LOG = Log.get_logger()
 

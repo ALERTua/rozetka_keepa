@@ -3,7 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timedelta
 from functools import cached_property
-from typing import Iterable, ClassVar
+from typing import ClassVar
+from collections.abc import Iterable
 
 from global_logger import Log
 from rozetka.entities.item import Item
@@ -13,7 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import EmailType, PasswordType, UUIDType
 
-from rozetka_keepa import constants
+from . import constants
 
 LOG = Log.get_logger()
 

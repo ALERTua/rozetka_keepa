@@ -2,15 +2,17 @@ from __future__ import annotations
 
 import asyncio
 from copy import copy
-from typing import Iterable, TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar
+from collections.abc import Iterable
 
 from aiohttp_retry import ExponentialRetry, RetryClient
 from global_logger import Log
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
+
 # noinspection PyPackageRequirements
 from worker import async_worker
 
-from rozetka_keepa import constants
+from . import constants
 
 if TYPE_CHECKING:
     from influxdb_client.client.flux_table import FluxTable, FluxRecord
@@ -24,8 +26,9 @@ INFLUXDB_BUCKET = constants.INFLUXDB_BUCKET
 
 INFLUX_KWARGS = dict(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG, timeout=600_000_000, enable_gzip=True)
 INFLUX_KWARGS_ASYNC = copy(INFLUX_KWARGS)
-INFLUX_KWARGS_ASYNC.update(dict(client_session_type=RetryClient,
-                                client_session_kwargs={"retry_options": ExponentialRetry(attempts=3)}))
+INFLUX_KWARGS_ASYNC.update(
+    dict(client_session_type=RetryClient, client_session_kwargs={"retry_options": ExponentialRetry(attempts=3)}),
+)
 
 
 class InfluxDBController:
@@ -78,8 +81,8 @@ from(bucket: "{INFLUXDB_BUCKET}")
         output = {}
         for point in points:
             record: FluxRecord = point.records[0]
-            item_id = int(record.values["_measurement"])  # noqa: PD011
-            price = float(record.values["price"])  # noqa: PD011
+            item_id = int(record.values["_measurement"])
+            price = float(record.values["price"])
             output[item_id] = price
         return output
 
@@ -102,4 +105,4 @@ from(bucket: "{INFLUXDB_BUCKET}")
 
 
 if __name__ == "__main__":
-    output_ = asyncio.run(InfluxDBController.get_prices_async([314164057 ]))
+    output_ = asyncio.run(InfluxDBController.get_prices_async([314164057]))

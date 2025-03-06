@@ -1,16 +1,19 @@
 from __future__ import annotations
 
+import asyncio
+
 import pendulum
 from aiogram import Bot, Dispatcher, Router
 from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.utils.text_decorations import HtmlDecoration, MarkdownDecoration
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from global_logger import Log
 from rozetka.entities.item import Item
 
-from rozetka_keepa.db import DBController
-from rozetka_keepa.models.callbacks import RemoveItemCallback
+from ..db import DBController  # noqa: TID252
+from ..models.callbacks import RemoveItemCallback  # noqa: TID252
+from .. import constants  # noqa: TID252
+
 
 LOG = Log.get_logger()
 
@@ -21,6 +24,8 @@ html = HtmlDecoration()
 md = MarkdownDecoration()
 
 router = Router()
+
+background_tasks = set()
 
 
 async def check(bot: Bot, dispatcher: Dispatcher, bots: list, router: Dispatcher):  # noqa: ARG001
@@ -78,10 +83,16 @@ async def check(bot: Bot, dispatcher: Dispatcher, bots: list, router: Dispatcher
     dbc.commit()
 
 
-async def checker_loop_start(**kwargs):
-    scheduler = AsyncIOScheduler()
-    scheduler.add_job(check, "interval", hours=1, id="checker_loop_id", kwargs=kwargs)
-    scheduler.start()
+async def checker_loop(bot: Bot, dispatcher: Dispatcher, bots: list, router_: Dispatcher):
+    while True:
+        await check(bot, dispatcher, bots, router_)
+        await asyncio.sleep(constants.LOOP_INTERVAL)
 
 
-router.startup.register(checker_loop_start)
+async def on_startup(bot: Bot, dispatcher: Dispatcher, bots: list, router_: Dispatcher):
+    task = asyncio.create_task(checker_loop(bot, dispatcher, bots, router_))
+    background_tasks.add(task)
+    task.add_done_callback(background_tasks.discard)
+
+
+router.startup.register(on_startup)
