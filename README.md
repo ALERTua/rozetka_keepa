@@ -3,6 +3,8 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
 [![Russian Warship Go Fuck Yourself](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/RussianWarship.svg)](https://stand-with-ukraine.pp.ua)
 
+[![Docker Image Latest](https://github.com/ALERTua/rozetka_keepa/actions/workflows/docker-image.yml/badge.svg)](https://github.com/ALERTua/rozetka_keepa/actions/workflows/docker-image.yml)
+
 Rozetka.ua Keepa
 ----------------
 
