@@ -6,7 +6,7 @@ authors = [
     { name = "Alexey ALERT Rubasheff", email = "alexey.rubasheff@gmail.com" }
 ]
 readme = "README.md"
-requires-python = "==3.12.*"
+requires-python = "==3.13.*"
 keywords = ["rozetka"]
 classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
@@ -18,7 +18,7 @@ dependencies = [
     "passlib>=1.7.4",
     "psycopg2-binary>=2.9.10",
     "python-dotenv>=1.0.1",
-    "rozetka-api>=1.6.9",
+    "rozetka-api>=1.7.0",
     "sqlalchemy>=2.0.38",
     "sqlalchemy-utils>=0.41.2",
     "tzdata>=2025.1",
@@ -42,3 +42,11 @@ dev = [
     "pytest>=8.3.5",
     "ruff>=0.9.9",
 ]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 88
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 88
+max-line-length = 120

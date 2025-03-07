@@ -92,4 +92,5 @@ async def on_startup(**kwargs):
     background_tasks.add(task)
     task.add_done_callback(background_tasks.discard)
 
+
 router.startup.register(on_startup)

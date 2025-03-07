@@ -3,8 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timedelta
 from functools import cached_property
-from typing import ClassVar
 from collections.abc import Iterable
+from typing import ClassVar
 
 from global_logger import Log
 from rozetka.entities.item import Item
@@ -95,7 +95,7 @@ class User(Base, DBBase):
 
 
 class DBController:
-    cache = []
+    cache: ClassVar = []
 
     def __init__(self, direct=True):  # noqa: FBT002
         assert not direct, "please use instantiate classmethod"
