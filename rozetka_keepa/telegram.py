@@ -1,12 +1,10 @@
-import asyncio
-
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 from aiogram.utils.text_decorations import HtmlDecoration, MarkdownDecoration
 from global_logger import Log
 
-from . import constants
-from .handlers import commands, loop
+from rozetka_keepa import constants
+from rozetka_keepa.handlers import commands, loop
 
 LOG = Log.get_logger()
 
@@ -35,6 +33,7 @@ async def set_commands(bot: Bot):
 
 
 async def main() -> None:
+    LOG.trace()
     bot = Bot(token=constants.TELEGRAM_BOT_API_TOKEN)
     dp = Dispatcher()
     dp.include_router(loop.router)
@@ -42,7 +41,3 @@ async def main() -> None:
     dp.message.filter(F.chat.type == "private")
     await set_commands(bot)
     await dp.start_polling(bot)  # , allowed_updates=dp.resolve_used_update_types())
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

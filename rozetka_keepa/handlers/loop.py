@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime
 
-import pendulum
 from aiogram import Bot, Dispatcher, Router
 from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -10,13 +10,11 @@ from aiogram.utils.text_decorations import HtmlDecoration, MarkdownDecoration
 from global_logger import Log
 from rozetka.entities.item import Item
 
-from ..db import DBController  # noqa: TID252
-from ..models.callbacks import RemoveItemCallback  # noqa: TID252
-from .. import constants  # noqa: TID252
-
+from rozetka_keepa.db import DBController
+from rozetka_keepa.models.callbacks import RemoveItemCallback
+from rozetka_keepa import constants
 
 LOG = Log.get_logger()
-
 
 dbc = DBController.instantiate()
 
@@ -35,8 +33,7 @@ async def check(bot: Bot, dispatcher: Dispatcher, bots: list, router: Dispatcher
         item_ids = [i.item_id for i in keepas]
         Item.parse_multiple(*item_ids, parse_subitems=False)
         for keepa in keepas:
-            pause_until = pendulum.instance(keepa.pause_until, tz=pendulum.local_timezone())
-            skip = pause_until > pendulum.now(tz=pendulum.local_timezone())
+            skip = keepa.pause_until.astimezone(tz=constants.TZ) > datetime.now(tz=constants.TZ)
             if skip:
                 continue
 
@@ -90,9 +87,9 @@ async def checker_loop(**kwargs):
 
 
 async def on_startup(**kwargs):
+    LOG.trace()
     task = asyncio.create_task(checker_loop(**kwargs))
     background_tasks.add(task)
     task.add_done_callback(background_tasks.discard)
-
 
 router.startup.register(on_startup)

@@ -1,6 +1,7 @@
 import os
 
 from global_logger import Log
+from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,3 +29,7 @@ TEAMS_WEBHOOK_URL = os.getenv("TEAMS_WEBHOOK_URL")
 TEAMS_USER_MENTIONS = os.getenv("TEAMS_USER_MENTIONS", "")
 
 LOOP_INTERVAL = int(os.getenv("LOOP_INTERVAL", "3600"))
+
+TZ_ENV = os.getenv("TZ", "Europe/London")
+
+TZ = ZoneInfo(TZ_ENV)

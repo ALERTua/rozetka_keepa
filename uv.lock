@@ -992,12 +992,12 @@ dependencies = [
     { name = "apscheduler" },
     { name = "global-logger" },
     { name = "passlib" },
-    { name = "pendulum" },
     { name = "psycopg2-binary" },
     { name = "python-dotenv" },
     { name = "rozetka-api" },
     { name = "sqlalchemy" },
     { name = "sqlalchemy-utils" },
+    { name = "tzdata" },
 ]
 
 [package.dev-dependencies]
@@ -1013,12 +1013,12 @@ requires-dist = [
     { name = "apscheduler", specifier = ">=3.11.0" },
     { name = "global-logger", specifier = ">=0.4.3" },
     { name = "passlib", specifier = ">=1.7.4" },
-    { name = "pendulum", specifier = ">=3.0.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "rozetka-api", specifier = ">=1.6.9" },
     { name = "sqlalchemy", specifier = ">=2.0.38" },
     { name = "sqlalchemy-utils", specifier = ">=0.41.2" },
+    { name = "tzdata", specifier = ">=2025.1" },
 ]
 
 [package.metadata.requires-dev]

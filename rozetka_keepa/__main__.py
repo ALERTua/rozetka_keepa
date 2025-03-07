@@ -2,13 +2,14 @@ import asyncio
 
 from global_logger import Log
 
-from . import constants
-from .telegram import main
+from rozetka_keepa import constants
+from rozetka_keepa.telegram import main
 
 LOG = Log.get_logger()
 
 
 def _main():
+    LOG.trace()
     return asyncio.run(main())
 
 

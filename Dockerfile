@@ -40,7 +40,7 @@ ENV \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     # app
     APP_DIR=/app \
-    SOURCE_DIR_NAME=src
+    SOURCE_DIR_NAME=rozetka_keepa
 
 
 WORKDIR $APP_DIR
@@ -54,4 +54,4 @@ COPY $SOURCE_DIR_NAME $SOURCE_DIR_NAME
 
 ENTRYPOINT []
 
-CMD uv run -m $SOURCE_DIR_NAME.rozetka_keepa
+CMD uv run -m $SOURCE_DIR_NAME

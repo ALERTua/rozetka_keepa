@@ -12,7 +12,7 @@ from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 # noinspection PyPackageRequirements
 from worker import async_worker
 
-from . import constants
+from rozetka_keepa import constants
 
 if TYPE_CHECKING:
     from influxdb_client.client.flux_table import FluxTable, FluxRecord

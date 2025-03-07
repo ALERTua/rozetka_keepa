@@ -16,12 +16,12 @@ dependencies = [
     "apscheduler>=3.11.0",
     "global-logger>=0.4.3",
     "passlib>=1.7.4",
-    "pendulum>=3.0.0",
     "psycopg2-binary>=2.9.10",
     "python-dotenv>=1.0.1",
     "rozetka-api>=1.6.9",
     "sqlalchemy>=2.0.38",
     "sqlalchemy-utils>=0.41.2",
+    "tzdata>=2025.1",
 ]
 [tool.uv]
 prerelease = "allow"

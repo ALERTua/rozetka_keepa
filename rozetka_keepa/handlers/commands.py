@@ -11,9 +11,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.utils.text_decorations import HtmlDecoration, MarkdownDecoration
 from rozetka.entities.item import Item
 
-from .. import constants, tools  # noqa: TID252
-from ..db import DBController  # noqa: TID252
-from ..models.callbacks import GetItemCallback, RemoveItemCallback  # noqa: TID252
+from rozetka_keepa import constants, tools
+from rozetka_keepa.db import DBController
+from rozetka_keepa.models.callbacks import GetItemCallback, RemoveItemCallback
 
 ITEM_CMD = "/item"
 USAGE = f"Usage: {ITEM_CMD} ID PRICE"

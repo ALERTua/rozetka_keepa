@@ -14,7 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import EmailType, PasswordType, UUIDType
 
-from . import constants
+from rozetka_keepa import constants
 
 LOG = Log.get_logger()
 
@@ -43,12 +43,12 @@ class DBBase:
 class Keepa(Base, DBBase):
     __tablename__ = "keepa"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    added = Column("added", DateTime, default=datetime.now())  # noqa: DTZ005  # TODO: local tz
+    added = Column("added", DateTime, default=datetime.now(tz=constants.TZ))
 
     item_id = Column("item_id", Integer)
     user_id = Column("user_id", ForeignKey("users.id"))
     wanted_price = Column("wanted_price", Float)
-    pause_until = Column("pause_until", DateTime, default=datetime.now())  # noqa: DTZ005  # TODO: local tz
+    pause_until = Column("pause_until", DateTime, default=datetime.now(tz=constants.TZ))
 
     def __repr__(self):
         return f"{self.item_id}@{self.wanted_price}"
@@ -58,10 +58,10 @@ class Keepa(Base, DBBase):
         return f"https://rozetka.com.ua/ua/search/?text={self.item_id}"
 
     def pause(self):
-        self.pause_until = datetime.now() + timedelta(days=1)  # noqa: DTZ005  # TODO: local tz
+        self.pause_until = datetime.now(tz=constants.TZ) + timedelta(days=1)
 
     def reset_pause(self):
-        self.pause_until = datetime.now()  # noqa: DTZ005  # TODO: local tz
+        self.pause_until = datetime.now(tz=constants.TZ)
 
     @property
     def item(self):
@@ -79,7 +79,7 @@ class User(Base, DBBase):
     __tablename__ = "users"
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    created = Column("created", DateTime, default=datetime.now())  # noqa: DTZ005  # TODO: local tz
+    created = Column("created", DateTime, default=datetime.now(tz=constants.TZ))
     auth_token = Column(name="auth_token", type_=UUIDType(binary=False), default=uuid.uuid4)
 
     telegram_id = Column(name="telegram_id", type_=Integer, nullable=True)
@@ -95,7 +95,7 @@ class User(Base, DBBase):
 
 
 class DBController:
-    cache: ClassVar[DBController] = []
+    cache = []
 
     def __init__(self, direct=True):  # noqa: FBT002
         assert not direct, "please use instantiate classmethod"
