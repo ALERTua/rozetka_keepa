@@ -5,11 +5,12 @@ on:
   push:
     branches: [ "main" ]
     paths-ignore:
-      - "script/**"
-      - "*.md"
-
-  pull_request:
-    branches: [ "main" ]
+      - "script/"
+      - "**/*.md"
+      - "**/*.rst"
+      - ".github/"
+      - ".pre-commit-config.yaml"
+      - "tests/"
 
 env:
   REGISTRY: ghcr.io
