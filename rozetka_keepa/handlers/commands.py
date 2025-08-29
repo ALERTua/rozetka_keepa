@@ -250,8 +250,6 @@ Cached Availability: {tools.sell_status_str(item_obj.sell_status)}
 
 @router.message(Command("test"))
 async def test_(message: Message):
-    from aiogram.utils.keyboard import InlineKeyboardBuilder
-
     builder = InlineKeyboardBuilder()
     builder.button(text="Page", url="https://google.com")
     remove_watch_callback_data = RemoveItemCallback(item_id=123456).pack()
